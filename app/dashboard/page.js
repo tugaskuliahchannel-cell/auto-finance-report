@@ -1,63 +1,127 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect,useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Bar } from "react-chartjs-2"
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement
+Chart as ChartJS,
+CategoryScale,
+LinearScale,
+BarElement,
+Tooltip,
+Legend
 } from "chart.js"
 
-ChartJS.register(CategoryScale,LinearScale,BarElement)
+ChartJS.register(
+CategoryScale,
+LinearScale,
+BarElement,
+Tooltip,
+Legend
+)
 
-export default function Dashboard(){
+export default function Page(){
 
-  const [income,setIncome]=useState(0)
-  const [expense,setExpense]=useState(0)
+const [data,setData]=useState([])
+const [saldo,setSaldo]=useState(0)
+const [income,setIncome]=useState(0)
+const [expense,setExpense]=useState(0)
 
-  useEffect(()=>{
-    loadData()
-  },[])
+useEffect(()=>{
+load()
+},[])
 
-  const loadData = async () => {
-    const { data } = await supabase
-      .from("transactions")
-      .select("*")
+const load = async ()=>{
+const { data } = await supabase
+.from("transactions")
+.select("*")
 
-    const totalIncome =
-      data
-        .filter(d=>d.type==="income")
-        .reduce((a,b)=>a+b.amount,0)
+setData(data)
 
-    const totalExpense =
-      data
-        .filter(d=>d.type==="expense")
-        .reduce((a,b)=>a+b.amount,0)
+let totalIncome=0
+let totalExpense=0
 
-    setIncome(totalIncome)
-    setExpense(totalExpense)
-  }
+data.forEach(item=>{
+if(item.type==="income"){
+totalIncome+=item.amount
+}else{
+totalExpense+=item.amount
+}
+})
 
-  return (
-    <div style={{padding:40}}>
-      <h1>Dashboard Keuangan</h1>
+setIncome(totalIncome)
+setExpense(totalExpense)
+setSaldo(totalIncome-totalExpense)
+}
 
-      <Bar
-        data={{
-          labels:["Income","Expense"],
-          datasets:[
-            {
-              label:"Cashflow",
-              data:[income,expense]
-            }
-          ]
-        }}
-      />
+const chartData={
+labels:["Income","Expense"],
+datasets:[
+{
+label:"Keuangan",
+data:[income,expense],
+backgroundColor:["green","red"]
+}
+]
+}
 
-      <h2>Total Income: Rp {income}</h2>
-      <h2>Total Expense: Rp {expense}</h2>
+return(
+<div style={{
+padding:40,
+background:"#eef2f7",
+minHeight:"100vh"
+}}>
 
-    </div>
-  )
+<h1>Dashboard Keuangan</h1>
+
+<div style={{
+display:"flex",
+gap:20,
+marginTop:20,
+flexWrap:"wrap"
+}}>
+
+<div style={{
+background:"white",
+padding:20,
+borderRadius:12,
+minWidth:200
+}}>
+<h3>Saldo Total</h3>
+<h2>Rp {saldo}</h2>
+</div>
+
+<div style={{
+background:"white",
+padding:20,
+borderRadius:12,
+minWidth:200
+}}>
+<h3>Total Income</h3>
+<h2 style={{color:"green"}}>Rp {income}</h2>
+</div>
+
+<div style={{
+background:"white",
+padding:20,
+borderRadius:12,
+minWidth:200
+}}>
+<h3>Total Expense</h3>
+<h2 style={{color:"red"}}>Rp {expense}</h2>
+</div>
+
+</div>
+
+<div style={{
+background:"white",
+padding:30,
+borderRadius:12,
+marginTop:30,
+maxWidth:600
+}}>
+<Bar data={chartData}/>
+</div>
+
+</div>
+)
 }
