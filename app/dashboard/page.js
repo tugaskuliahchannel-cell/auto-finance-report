@@ -21,7 +21,6 @@ Legend
 
 export default function Page(){
 
-const [data,setData]=useState([])
 const [saldo,setSaldo]=useState(0)
 const [income,setIncome]=useState(0)
 const [expense,setExpense]=useState(0)
@@ -34,8 +33,6 @@ const load = async ()=>{
 const { data } = await supabase
 .from("transactions")
 .select("*")
-
-setData(data)
 
 let totalIncome=0
 let totalExpense=0
@@ -59,7 +56,7 @@ datasets:[
 {
 label:"Keuangan",
 data:[income,expense],
-backgroundColor:["green","red"]
+backgroundColor:["#22c55e","#ef4444"]
 }
 ]
 }
@@ -67,47 +64,55 @@ backgroundColor:["green","red"]
 return(
 <div style={{
 padding:40,
-background:"#eef2f7",
-minHeight:"100vh"
+background:"#f1f5f9",
+minHeight:"100vh",
+color:"#111"
 }}>
 
-<h1>Dashboard Keuangan</h1>
+<h1 style={{marginBottom:20}}>Dashboard Keuangan</h1>
 
 <div style={{
 display:"flex",
 gap:20,
-marginTop:20,
 flexWrap:"wrap"
 }}>
 
 <div style={{
 background:"white",
-padding:20,
-borderRadius:12,
-minWidth:200
+padding:25,
+borderRadius:14,
+minWidth:220,
+boxShadow:"0 5px 15px rgba(0,0,0,0.08)"
 }}>
-<h3>Saldo Total</h3>
-<h2>Rp {saldo}</h2>
+<h3 style={{marginBottom:10}}>Saldo Total</h3>
+<h1 style={{
+fontSize:32,
+color: saldo>=0 ? "#16a34a" : "#dc2626"
+}}>
+Rp {saldo}
+</h1>
 </div>
 
 <div style={{
 background:"white",
-padding:20,
-borderRadius:12,
-minWidth:200
+padding:25,
+borderRadius:14,
+minWidth:220,
+boxShadow:"0 5px 15px rgba(0,0,0,0.08)"
 }}>
 <h3>Total Income</h3>
-<h2 style={{color:"green"}}>Rp {income}</h2>
+<h2 style={{color:"#16a34a"}}>Rp {income}</h2>
 </div>
 
 <div style={{
 background:"white",
-padding:20,
-borderRadius:12,
-minWidth:200
+padding:25,
+borderRadius:14,
+minWidth:220,
+boxShadow:"0 5px 15px rgba(0,0,0,0.08)"
 }}>
 <h3>Total Expense</h3>
-<h2 style={{color:"red"}}>Rp {expense}</h2>
+<h2 style={{color:"#dc2626"}}>Rp {expense}</h2>
 </div>
 
 </div>
@@ -115,9 +120,10 @@ minWidth:200
 <div style={{
 background:"white",
 padding:30,
-borderRadius:12,
+borderRadius:14,
 marginTop:30,
-maxWidth:600
+maxWidth:700,
+boxShadow:"0 5px 15px rgba(0,0,0,0.05)"
 }}>
 <Bar data={chartData}/>
 </div>
