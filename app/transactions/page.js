@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabase"
 
 export default function Page(){
 
+  const [type,setType]=useState("expense")
+  const [category,setCategory]=useState("")
   const [amount,setAmount]=useState("")
   const [note,setNote]=useState("")
   const [data,setData]=useState([])
@@ -25,14 +27,15 @@ export default function Page(){
 
     await supabase.from("transactions").insert([
       {
-        type:"income",
-        category:"test",
+        type,
+        category,
         account:"pribadi",
         amount:Number(amount),
         note
       }
     ])
 
+    setCategory("")
     setAmount("")
     setNote("")
     loadData()
@@ -50,7 +53,25 @@ export default function Page(){
   return (
     <div style={{padding:40}}>
 
-      <h1>Input Transaksi</h1>
+      <h1>Transaksi Keuangan</h1>
+
+      <select
+        value={type}
+        onChange={e=>setType(e.target.value)}
+      >
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+
+      <br/><br/>
+
+      <input
+        placeholder="Kategori"
+        value={category}
+        onChange={e=>setCategory(e.target.value)}
+      />
+
+      <br/><br/>
 
       <input
         placeholder="Nominal"
@@ -74,19 +95,18 @@ export default function Page(){
 
       <hr/>
 
-      <h2>Data Transaksi</h2>
+      <h2>List Transaksi</h2>
 
-      {data.map(item => (
+      {data.map(item=>(
         <div key={item.id} style={{marginBottom:10}}>
-          Rp {item.amount} - {item.note}
+          {item.type.toUpperCase()} |
+          {item.category} |
+          Rp {item.amount} |
+          {item.note}
 
           <button
             onClick={()=>hapus(item.id)}
-            style={{
-              marginLeft:10,
-              background:"red",
-              color:"white"
-            }}
+            style={{marginLeft:10}}
           >
             Hapus
           </button>
